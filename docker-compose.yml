@@ -24,11 +24,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./web:/app/web
-      - ./survey:/app/survey
-      - ./bot:/app/bot
-      - static:/app/static
-      - media:/app/media
+      - .:/app
     depends_on:
       db:
         condition: service_healthy
