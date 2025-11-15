@@ -1,24 +1,27 @@
-from aiogram import Router, F
+from aiogram import Router
 from aiogram.types import Message
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
 from states.survey import Survey
 from keyboards.inline import yes_no_kb
 from services.clean_message import send_clean_message
 
-router = Router()   # <<< ВАЖНО — именно этого не хватало
+router = Router()
 
 
-@router.message(F.text == "/start")
+@router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
+    # очищаем состояние на всякий случай
     await state.clear()
 
-    # можно удалить саму команду /start, чтобы чат был чище
+    # пытаемся удалить команду /start чтобы не засорять переписку
     try:
         await message.delete()
-    except Exception:
+    except:
         pass
 
+    # отправляем первое сообщение пользователю (с авто-удалением предыдущего)
     await send_clean_message(
         state=state,
         chat_id=message.from_user.id,

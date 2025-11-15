@@ -31,10 +31,9 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "
-        python manage.py migrate &&
-        gunicorn web.wsgi:application --bind 0.0.0.0:8000
-      "
+      sh -c "python web/manage.py migrate &&
+            gunicorn web.wsgi:application --bind 0.0.0.0:8000"
+
     ports:
       - "8000:8000"
     networks:
