@@ -63,7 +63,7 @@ REST_FRAMEWORK = {
 }
 
 
-ROOT_URLCONF = 'web.web.urls'
+ROOT_URLCONF = 'web.urls'
 
 TEMPLATES = [
     {
