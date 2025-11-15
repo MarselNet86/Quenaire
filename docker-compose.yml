@@ -24,7 +24,9 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - ./web:/app/web
+      - ./survey:/app/survey
+      - ./bot:/app/bot
       - static:/app/static
       - media:/app/media
     depends_on:
@@ -32,8 +34,7 @@ services:
         condition: service_healthy
     command: >
       sh -c "python web/manage.py migrate &&
-            gunicorn web.web.wsgi:application --bind 0.0.0.0:8000"
-
+             gunicorn web.web.wsgi:application --bind 0.0.0.0:8000"
     ports:
       - "8000:8000"
     networks:
@@ -47,8 +48,6 @@ services:
     depends_on:
       - web
       - db
-    volumes:
-      - .:/app
     command: >
       sh -c "python bot/main.py"
     networks:
