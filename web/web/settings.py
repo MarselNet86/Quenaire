@@ -63,7 +63,7 @@ REST_FRAMEWORK = {
 }
 
 
-ROOT_URLCONF = 'web.urls'
+ROOT_URLCONF = 'web.web.urls'
 
 TEMPLATES = [
     {
@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'web.wsgi.application'
+WSGI_APPLICATION = 'web.web.wsgi.application'
 
 
 # Database
