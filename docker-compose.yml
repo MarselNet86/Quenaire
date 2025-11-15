@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: quenaire_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  web:
+    build: .
+    container_name: quenaire_web
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - static:/app/static
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        gunicorn web.wsgi:application --bind 0.0.0.0:8000
+      "
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  bot:
+    build: .
+    container_name: quenaire_bot
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - db
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python bot/main.py"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  static:
+  media:
+
+networks:
+  app-network:
+    driver: bridge
