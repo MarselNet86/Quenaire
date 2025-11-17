@@ -138,10 +138,24 @@ async def finish(call: CallbackQuery, state: FSMContext):
     await state.update_data(current_services=call.data)
     data = await state.get_data()
 
-    # отправляем в Django API
-    await send_survey(data)
+    # отправляем данные в backend
+    success, result = await send_survey(data)
 
-    # финальное сообщение
+    if not success:
+        # информируем пользователя о неудачном запросе
+        await send_clean_message(
+            state=state,
+            chat_id=call.from_user.id,
+            bot=call.bot,
+            text=(
+                "❗ Произошла ошибка при отправке заявки.\n\n"
+                f"Описание: <b>{result}</b>\n\n"
+                "Сообщите об этом нам @Khuchashev."
+            )
+        )
+        return  # не продолжаем
+
+    # если всё ок — финальное сообщение
     await send_clean_message(
         state=state,
         chat_id=call.from_user.id,
