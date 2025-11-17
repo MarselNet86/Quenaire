@@ -28,6 +28,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ["quenaire.xrtkx.ru", "127.0.0.1", "localhost"]
+CSRF_TRUSTED_ORIGINS = [
+    'https://quenaire.xrtkx.ru',
+]
 
 
 # Application definition
@@ -149,3 +152,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 МБ (в байтах)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 МБ (в байтах)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
