@@ -4,30 +4,59 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 
 from states.survey import Survey
-from keyboards.inline import yes_no_kb
-from services.clean_message import send_clean_message
+from keyboards.inline import client_type_kb
+from keyboards.reply import request_phone_kb
+from services.api import ApiClient
+
 
 router = Router()
+api = ApiClient()
 
 
 @router.message(CommandStart())
 async def start(message: Message, state: FSMContext):
-    # очищаем состояние на всякий случай
     await state.clear()
 
-    # пытаемся удалить команду /start чтобы не засорять переписку
-    try:
-        await message.delete()
-    except:
-        pass
+    # Проверка пользователя
+    status, data = await api.check_user(message.from_user.id)
 
-    # отправляем первое сообщение пользователю (с авто-удалением предыдущего)
-    await send_clean_message(
-        state=state,
-        chat_id=message.from_user.id,
-        bot=message.bot,
-        text="Добрый день! Хотите оставить заявку на подключение услуги?",
-        reply_markup=yes_no_kb(),
+    # Если юзер НЕ существует → просим отправить контакт
+    if not data.get("exists"):
+        await message.answer(
+            "Чтобы продолжить, отправьте номер телефона:",
+            reply_markup=request_phone_kb()
+        )
+        await state.set_state(Survey.phone)  # ждём номер
+        return
+    
+    # Если юзер есть и телефон есть → начинаем опрос
+    await message.answer(
+        "Добрый день!\n\n"
+        "Вы действующий клиент или новый клиент?",
+        reply_markup=client_type_kb(),
+    )
+    await state.set_state(Survey.client_type)
+
+
+
+@router.message(Survey.phone)
+async def phone_received(message: Message, state: FSMContext):
+    if not message.contact:
+        await message.answer("Пожалуйста, нажмите кнопку для отправки номера.")
+        return
+
+    phone = message.contact.phone_number
+
+    # Регистрируем пользователя сразу с телефоном
+    await api.register_user(
+        user=message.from_user,
+        phone=phone
     )
 
-    await state.set_state(Survey.want_service)
+    await message.answer(
+        "Спасибо! Номер сохранён.\n\n"
+        "Вы действующий клиент или новый клиент?",
+        reply_markup=client_type_kb(),
+    )
+
+    await state.set_state(Survey.client_type)

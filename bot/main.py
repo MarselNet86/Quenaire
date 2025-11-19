@@ -6,6 +6,7 @@ from aiogram.enums import ParseMode
 from config import BOT_TOKEN
 from handlers.start import router as start_router
 from handlers.questions import router as questions_router
+from handlers.query import router as query_router
 
 
 async def main():
@@ -18,6 +19,7 @@ async def main():
 
     dp.include_router(start_router)
     dp.include_router(questions_router)
+    dp.include_router(query_router)
 
     print("Бот запущен...")
     await dp.start_polling(bot)
