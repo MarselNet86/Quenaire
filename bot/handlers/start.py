@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
+from aiogram.types import ReplyKeyboardRemove
 
 from states.survey import Survey
 from keyboards.inline import client_type_kb
@@ -54,9 +55,15 @@ async def phone_received(message: Message, state: FSMContext):
     )
 
     await message.answer(
-        "Спасибо! Номер сохранён.\n\n"
+        "📱 Спасибо! Номер успешно сохранён.",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+    await message.answer(
+        "Пожалуйста, выберите 👇\n\n"
         "Вы действующий клиент или новый клиент?",
         reply_markup=client_type_kb(),
     )
+
 
     await state.set_state(Survey.client_type)
