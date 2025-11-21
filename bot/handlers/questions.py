@@ -129,7 +129,7 @@ async def choose_house_type(call: CallbackQuery, state: FSMContext):
 
 @router.message(Survey.apartment)
 async def apartment_step(message: Message, state: FSMContext):
-    await state.update_data(apartment=message.text)
+    await state.update_data(apartment_number=message.text)
 
     await message.answer("⏳ Отправляю вашу заявку...")
 
