@@ -27,4 +27,4 @@ class SettlementSerializer(serializers.ModelSerializer):
 class SurveyRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurveyRequest
-        fields = ["id", "user", "settlement", "settlement_custom", "street", "house"]
+        fields = ["id", "user", "settlement", "settlement_custom", "street", "house", "apartment_number"]

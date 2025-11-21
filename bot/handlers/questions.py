@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from states.survey import Survey
-from keyboards.inline import client_type_kb, settlements_kb
+from keyboards.inline import client_type_kb, settlements_kb, house_type_kb
 from services.api import ApiClient
 
 
@@ -84,10 +84,56 @@ async def street_step(message: Message, state: FSMContext):
 async def house_step(message: Message, state: FSMContext):
     await state.update_data(house=message.text)
 
+    await message.answer(
+        "Укажите тип жилья:",
+        reply_markup=house_type_kb()
+    )
+
+    await state.set_state(Survey.house_type)
+
+
+@router.callback_query(Survey.house_type)
+async def choose_house_type(call: CallbackQuery, state: FSMContext):
+    if call.data == "house_private":
+        # частный дом → квартира не нужна
+        await state.update_data(apartment=None)
+
+        await call.message.edit_text("⏳ Отправляю вашу заявку...")
+
+        data = await state.get_data()
+
+        success, resp = await api.check_user(call.from_user.id)
+        data['user'] = resp['user']['id']
+
+        success, resp = await api.send_survey(data)
+
+        if not success:
+            await call.message.answer(
+                "❗ Произошла ошибка при отправке заявки.\n"
+                f"<b>{resp}</b>"
+            )
+            return
+
+        await call.message.answer(
+            "🎉 Спасибо! Ваша заявка успешно отправлена!\n"
+            "Мы свяжемся с вами в ближайшее время 🙌"
+        )
+        await state.clear()
+        return
+
+    # квартира → спрашиваем номер квартиры
+    if call.data == "house_flat":
+        await call.message.edit_text("🏢 Укажите номер квартиры:")
+        await state.set_state(Survey.apartment)
+
+
+@router.message(Survey.apartment)
+async def apartment_step(message: Message, state: FSMContext):
+    await state.update_data(apartment=message.text)
+
     await message.answer("⏳ Отправляю вашу заявку...")
 
     data = await state.get_data()
-
 
     success, resp = await api.check_user(message.from_user.id)
     data['user'] = resp['user']['id']

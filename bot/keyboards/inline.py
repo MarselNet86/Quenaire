@@ -46,3 +46,10 @@ def settlements_kb(top10: list):
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
+def house_type_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🏠 Частный дом", callback_data="house_private")],
+        [InlineKeyboardButton(text="🏢 Квартира", callback_data="house_flat")],
+    ])

@@ -65,6 +65,7 @@ class SurveyRequestAdmin(admin.ModelAdmin):
         "settlement_display",
         "street",
         "house",
+        "apartment_number",
         "created_at",
     )
 
@@ -86,7 +87,7 @@ class SurveyRequestAdmin(admin.ModelAdmin):
             "fields": ("user",)
         }),
         ("Адрес", {
-            "fields": ("settlement", "settlement_custom", "street", "house")
+            "fields": ("settlement", "settlement_custom", "street", "house", "apartment_number",)
         }),
         ("Системное", {
             "fields": ("created_at",),

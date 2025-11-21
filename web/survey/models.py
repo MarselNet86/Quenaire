@@ -62,6 +62,12 @@ class SurveyRequest(models.Model):
 
     street = models.CharField("Улица", max_length=128)
     house = models.CharField("Дом", max_length=32)
+    apartment_number = models.CharField(
+        "Номер квартиры",
+        max_length=32,
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
